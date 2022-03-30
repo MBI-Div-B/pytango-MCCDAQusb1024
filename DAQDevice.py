@@ -60,7 +60,7 @@ class DAQDevice(Device):
                 # Establish a connection to the DAQ device.
                 self.descriptor = self.daq_device.get_descriptor()
                 self.daq_device.connect(connection_code=0)
-                self.set_state(DevState.INIT)
+                self.set_state(DevState.ON)
                 self.set_status('Establish a connection to the DAQ device {:s}'.format(self.descriptor.dev_string))
         
       
@@ -70,23 +70,21 @@ class DAQDevice(Device):
         port_types = [self.Port_types_A, self.Port_types_B, self.Port_types_C, self.Port_types_Counter]
         port_type_index=['A','B','C','Counter']
         DYN_ATTRS = []
-        k=0
 
-        for i in port_types:
+        for k, i in enumerate(port_types):
             if i==True and self.Port_types_Counter!=True:
-                for j in range(0,8):
+                for j in range(8):
                     port = dict(name='{typ}{nr}'.format(typ=port_type_index[k], nr=str(j)), 
                                 dtype=tango.DevBoolean, access=READ)
                     DYN_ATTRS.append(port)
             elif i==True and self.Port_types_Counter==True:
                 port = dict(name='CTR', dtype=tango.DevInt, access=READ)
                 DYN_ATTRS.append(port)
-                
-            k+=1
+
             
         if DYN_ATTRS:
+            self.set_status('Ports have been selected.')
             for d in DYN_ATTRS:
-                self.set_status('Ports have been selected.')
                 self.make_attribute(d)
         else:
             self.set_status("No ports are selected. Select a port type, refresh the Attributes and restart the device's jive interfaces to see changes.")
@@ -156,24 +154,17 @@ class DAQDevice(Device):
                 self.port_info.port_io_type == DigitalPortIoType.BITIO):
             self.dio_device.d_config_port(self.port_to_read, DigitalDirection.INPUT)
         
-        while True:
-            self.set_state(DevState.RUNNING)
-            self.set_status('Reading data')
-            self.data = self.dio_device.d_in(self.port_to_read)
-            if port_types_index==3:
-                return self.data
+        self.set_state(DevState.RUNNING)
+        self.set_status('Reading data')
+        self.data = self.dio_device.d_in(self.port_to_read)
+        if port_types_index==3:
+            return self.data
+        else:
+            data_bit_list=list(format(self.data,'08b'))
+            if int(data_bit_list[key]) == 0:
+                return False
             else:
-                data_bit_list=list(format(self.data,'08b'))
-                if int(data_bit_list[key]) == 0:
-                    return False
-                else:
-                    return True
-                
-        
-    @command
-    def refreshAtt(self):
-        self.initialize_dynamic_attributes()
-                    
+                return True
         
     def delete_device(self):
         if self.daq_device:
