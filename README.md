@@ -1,3 +1,4 @@
-# DAQDevice
-This tango device server reads out the input of all ports of a DAQ device with port types A, B, C & Counter. The code is written with pytango and to read the DAQ device one needs the python lib uldaq which can be installed easily as described here https://pypi.org/project/uldaq/.  
+# MCCDAQ USB1024
+
+This pytango device server can read and write the DIOs of a MCCDAQ USB1024-type device using the https://pypi.org/project/uldaq driver.
 
