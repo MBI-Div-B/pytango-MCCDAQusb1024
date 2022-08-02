@@ -85,7 +85,7 @@ class MCCDAQusb1024(Device):
                                                      self.port_names,
                                                      self.port_configs):
             if port_name == 'CTR' and port_config:
-                port = dict(name=port_name, dtype=tango.DevBoolean,
+                port = dict(name=port_name, dtype=tango.DevInt,
                             access=READ)
                 DYN_ATTRS.append(port)
                 self.info_stream('Initialized CTR')
@@ -128,7 +128,6 @@ class MCCDAQusb1024(Device):
         name, dtype, access = [attr_dict.pop(k) for k in props]
         new_attr = Attr(name, dtype, access)
         default_props = tango.UserDefaultAttrProp()
-        print(default_props)
         # build attribute for all enabled ports
         for k, v in attr_dict.items():
             try:
