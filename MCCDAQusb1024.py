@@ -67,14 +67,15 @@ class MCCDAQusb1024(Device):
             if self.dio_device is None:
                 self.set_state(DevState.ALARM)
                 self.set_status('Error: The DAQ device does '
-                    'not support digital input')
+                                'not support digital input')
             else:
                 # Establish a connection to the DAQ device.
                 self.descriptor = self.daq_device.get_descriptor()
                 self.daq_device.connect(connection_code=0)
                 self.set_state(DevState.ON)
                 self.info_stream('Establish a connection to the DAQ '
-                    'device {:s}'.format(self.descriptor.dev_string))
+                                 'device {:s}'.format(
+                                     self.descriptor.dev_string))
 
     def initialize_dynamic_attributes(self):
         # create automaticly attributes
@@ -115,7 +116,7 @@ class MCCDAQusb1024(Device):
                 else:
                     # port disabled
                     self.info_stream('Port {:s} not '
-                        'configured'.format(port_name))
+                                     'configured'.format(port_name))
 
         if DYN_ATTRS:
             for d in DYN_ATTRS:
@@ -135,24 +136,24 @@ class MCCDAQusb1024(Device):
                 property_setter(v)
             except AttributeError:
                 self.error_stream('Error setting attribute '
-                    'property: {:s}'.format(name))
+                                  'property: {:s}'.format(name))
         new_attr.set_default_properties(default_props)
         if access == READ:
             if name == 'CTR':
                 self.add_attribute(new_attr, r_meth=self.read_CTR)
                 self.info_stream('Added dynamic attribute '
-                    '{:s} as counter'.format(name))
+                                 '{:s} as counter'.format(name))
             else:
                 self.add_attribute(new_attr, r_meth=self.read_DI)
                 self.info_stream('Added dynamic attribute {:s} '
-                    'as DI'.format(name))
+                                 'as DI'.format(name))
         elif access == WRITE:
             self.add_attribute(new_attr, w_meth=self.write_DO)
             self.info_stream('Added dynamic attribute {:s} '
-                'as DO'.format(name))
+                             'as DO'.format(name))
         else:
             self.error_stream('Only READ or WRITE access types '
-                'are supported!')
+                              'are supported!')
 
     def connector_info(self, attr):
         attr_name = attr.get_name()
